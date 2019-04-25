@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <style type="text/css">
+      body {
+        background: black;
+        color: white;
+      }
+      div.container {
+        max-width: 1000px;
+        margin: 100px auto;
+        border: 20px solid white;
+        padding: 10px;
+        text-align: center;
+      }
+      h4 {
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h4>Russell</h4>
+      <img src="{{url}}" />
+      <p><small>Courtesy: <a href="https://clutchpoints.com/wp-content/uploads/2019/04/Russell-Westbrook.jpg">Russell</a></small></p>
+    </div>
+    <div>
+      <form method="POST" action="/add_recipe">
+        <h3>Recipe to Add</h3>
+        <input type="text" name="added_recipe" value="Submit">
+      </form>
+    </div>
+  </body>
+</html>

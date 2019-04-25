@@ -1,0 +1,17 @@
+selenium
+flask==0.12.2
+psycopg2==2.7.5
+SQLAlchemy==1.2.14
+pandas==0.23.4
+sqlalchemy_repr==0.0.1
+flask_sqlalchemy==2.3.2
+flask-login==0.4.1
+flask-mail==0.9.1
+itsdangerous==1.1.0
+flask-wtf==0.14.2
+requests
+scipy==1.2.1
+scikit-learn==0.20.3
+numpy==1.15.4
+redis==3.2.0
+rq==0.13.0

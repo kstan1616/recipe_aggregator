@@ -1,0 +1,9 @@
+version: "3.3"
+services:
+  web:
+    restart: always
+    build: .
+    ports:
+      - 80:80
+    volumes:
+      - ./recipe_app:/recipe_app

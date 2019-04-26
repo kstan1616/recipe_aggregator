@@ -16,19 +16,36 @@
         text-transform: uppercase;
       }
     </style>
+    <title> Recipe Aggregator </title>
   </head>
   <body>
     <div class="container">
-      <h4>Russell</h4>
       <img src="{{url}}" />
-      <p><small>Courtesy: <a href="https://clutchpoints.com/wp-content/uploads/2019/04/Russell-Westbrook.jpg">Russell</a></small></p>
-    </div>
-    <div>
+      <p><small>Courtesy: <a href="https://cooking.nytimes.com/?action=click&module=nav&region=logo&pgType=recipe-page">NYT Cooking</a></small></p>
       <form method="POST" action="/add_recipe">
-        <h3>Recipe to Add</h3>
-        <input type="text" name="added_recipe">
+        <h3>NYT Cooking Recipe to Add</h3>
+        <input type="text" name="added_recipe_nyt">
+        <input type="Submit">
+      </form>
+      <p><small>Courtesy: <a href="https://www.epicurious.com">Epicurious</a></small></p>
+      <form method="POST" action="/add_recipe">
+        <h3>Epicurious Recipe to Add</h3>
+        <input type="text" name="added_recipe_epi">
+        <input type="Submit">
+      </form>
+      <p><small>Courtesy: <a href="https://www.allrecipes.com">All Recipes</a></small></p>
+      <form method="POST" action="/add_recipe">
+        <h3>All Recipes Recipe to Add</h3>
+        <input type="text" name="added_recipe_all">
         <input type="Submit">
       </form>
     </div>
+    <!-- <div>
+      <form method="POST" action="/add_recipe">
+        <h3>NYT Cooking Recipe to Add</h3>
+        <input type="text" name="added_recipe">
+        <input type="Submit">
+      </form>
+    </div> -->
   </body>
 </html>

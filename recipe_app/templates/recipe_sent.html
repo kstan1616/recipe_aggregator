@@ -16,14 +16,9 @@
         text-transform: uppercase;
       }
     </style>
-    <title> Recipe Aggregator </title>
+    <title> Success! </title>
   </head>
   <body>
-    <h1>{{recipe|safe}}</h1>
-    <form method="POST" action="/recipe_sent">
-      <h3>Send Recipe to Email</h3>
-      <input type="text" name="recipe_sent">
-      <input type="Submit">
-    </form>
+    <h1>Recipe Sent to {{email}}</h1>
   </body>
 </html>

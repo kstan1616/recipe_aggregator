@@ -9,14 +9,14 @@ app = Flask(__name__)
 @app.route("/index", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        return render_template("add_recipe.html", recipe=recipe)
+    	add_recipe()
     else:
         url = 'https://clutchpoints.com/wp-content/uploads/2019/04/Russell-Westbrook.jpg'
         return render_template('index.html', url=url)
 
 @app.route("/add_recipe", methods=["GET", "POST"])
 def add_recipe():
-    recipe = request.form.get("recipe")
+    recipe = request.form['added_recipe']
     return render_template('add_recipe.html', recipe=recipe)
 
 if __name__ == "__main__":

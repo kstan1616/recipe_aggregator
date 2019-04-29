@@ -23,7 +23,7 @@ ENV DISPLAY=:99
 
 # tell the port number the container should expose
 EXPOSE 80
-#EXPOSE 4444
+EXPOSE 25
 
 # run the command
 CMD python ./app.py

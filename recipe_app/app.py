@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request
-import random
 from recipe_aggregator import get_ingredients
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
-
-# list of cat images
+mail = Mail(app)
 
 @app.route('/')
 @app.route("/index", methods=["GET", "POST"])
@@ -17,7 +16,6 @@ def index():
             recipe_urls = ''
         recipe_urls = recipe_urls + '\n' + request.form['added_recipe']
         return render_template('index.html', url=url, recipe_urls=recipe_urls)
-        	# add_recipe()
     else:
         recipe_urls = ''
         return render_template('index.html', url=url, recipe_urls=recipe_urls)
@@ -35,6 +33,7 @@ def add_recipe():
                 ingredient_list.scrape_ingredients(recipe_link, 'nyt')
             if 'allrecipes' in recipe_link:
                 ingredient_list.scrape_ingredients(recipe_link, 'all')
+        ingredient_list.clean_list()
         recipe = ingredient_list.final_df
         return render_template('add_recipe.html', recipe=recipe.to_html(classes='data', header="true"))
     else:
@@ -45,6 +44,12 @@ def add_recipe():
 @app.route("/recipe_sent", methods=["GET", "POST"])
 def recipe_sent():
     email = request.form['recipe_sent']
+    # recipe_list = request.form['recipe_list']
+    # msg = Message("Recipe List",
+    #               sender="kyle.m.stanley16@gmail.com",
+    #               recipients=["kyle.m.stanley16@gmail.com"])
+    # msg.html = recipe_list
+    # mail.send(msg)
     return render_template('recipe_sent.html', email=email)
 
 if __name__ == "__main__":

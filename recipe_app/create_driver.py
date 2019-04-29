@@ -9,5 +9,5 @@ class chrome_driver():
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--disable-gpu')
         self.driver = webdriver.Chrome(chrome_options=chrome_options)
-        self.driver.implicitly_wait(10)
+        self.driver.implicitly_wait(5)
         return self.driver

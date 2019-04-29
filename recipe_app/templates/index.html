@@ -22,22 +22,32 @@
     <div class="container">
       <img src="{{url}}" />
       <p><small>Courtesy: <a href="https://cooking.nytimes.com/?action=click&module=nav&region=logo&pgType=recipe-page">NYT Cooking</a></small></p>
-      <form method="POST" action="/add_recipe">
+      <form method="POST" action="/index">
         <h3>NYT Cooking Recipe to Add</h3>
-        <input type="text" name="added_recipe_nyt">
-        <input type="Submit">
+        <input type="text" name="added_recipe">
+        <input type="hidden" name="recipe_urls" value="{{recipe_urls}}">
+        <input type="submit">
       </form>
       <p><small>Courtesy: <a href="https://www.epicurious.com">Epicurious</a></small></p>
-      <form method="POST" action="/add_recipe">
+      <form method="POST" action="/index">
         <h3>Epicurious Recipe to Add</h3>
-        <input type="text" name="added_recipe_epi">
-        <input type="Submit">
+        <input type="text" name="added_recipe">
+        <input type="hidden" name="recipe_urls" value="{{recipe_urls}}">
+        <input type="submit">
       </form>
       <p><small>Courtesy: <a href="https://www.allrecipes.com">All Recipes</a></small></p>
-      <form method="POST" action="/add_recipe">
+      <form method="POST" action="/index">
         <h3>All Recipes Recipe to Add</h3>
-        <input type="text" name="added_recipe_all">
-        <input type="Submit">
+        <input type="text" name="added_recipe">
+        <input type="hidden" name="recipe_urls" value="{{recipe_urls}}">
+        <input type="submit">
+      </form>
+      <p><small>Added Recipes</small></p>
+      <h3> {{recipe_urls}} </h3>
+      <form method="POST" action="/add_recipe">
+        <h2>Build Recipe List</h3>
+        <input type="hidden" name="recipe_urls" value="{{recipe_urls}}">
+        <input type="submit">
       </form>
     </div>
     <!-- <div>

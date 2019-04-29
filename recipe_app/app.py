@@ -9,29 +9,38 @@ app = Flask(__name__)
 @app.route('/')
 @app.route("/index", methods=["GET", "POST"])
 def index():
+    url = 'https://media.istockphoto.com/photos/empty-plate-with-knife-and-fork-on-white-kitchen-table-picture-id613022722?k=6&m=613022722&s=612x612&w=0&h=Fr-1qc4a04U0fI0wUlrTu1I-UeGycNNtMlN7pPPXAtc='
     if request.method == "POST":
-    	add_recipe()
+        try:
+            recipe_urls = request.form['recipe_urls']
+        except:
+            recipe_urls = ''
+        recipe_urls = recipe_urls + '\n' + request.form['added_recipe']
+        return render_template('index.html', url=url, recipe_urls=recipe_urls)
+        	# add_recipe()
+    else:
+        recipe_urls = ''
+        return render_template('index.html', url=url, recipe_urls=recipe_urls)
+
+@app.route("/add_recipe", methods=["GET", "POST"])
+def add_recipe():
+    if request.method == "POST":
+        ingredient_list = get_ingredients()
+        recipe_urls = request.form['recipe_urls'].split('\n')
+        print(recipe_urls)
+        for recipe_link in recipe_urls:
+            if 'epicurious' in recipe_link:
+                ingredient_list.scrape_ingredients(recipe_link, 'epi')
+            if 'nytimes' in recipe_link:
+                ingredient_list.scrape_ingredients(recipe_link, 'nyt')
+            if 'allrecipes' in recipe_link:
+                ingredient_list.scrape_ingredients(recipe_link, 'all')
+        recipe = ingredient_list.final_df
+        return render_template('add_recipe.html', recipe=recipe.to_html(classes='data', header="true"))
     else:
         url = 'https://media.istockphoto.com/photos/empty-plate-with-knife-and-fork-on-white-kitchen-table-picture-id613022722?k=6&m=613022722&s=612x612&w=0&h=Fr-1qc4a04U0fI0wUlrTu1I-UeGycNNtMlN7pPPXAtc='
         return render_template('index.html', url=url)
 
-@app.route("/add_recipe", methods=["GET", "POST"])
-def add_recipe():
-    try:
-        recipe_link = request.form['added_recipe_nyt']
-        recipe = get_ingredients(recipe_link, 'nyt')
-    except:
-        try:
-            recipe_link = request.form['added_recipe_epi']
-            recipe = get_ingredients(recipe_link, 'epi')
-        except:
-            try:
-                recipe_link = request.form['added_recipe_all']
-                recipe = get_ingredients(recipe_link, 'all')
-            except:
-                url = 'https://media.istockphoto.com/photos/empty-plate-with-knife-and-fork-on-white-kitchen-table-picture-id613022722?k=6&m=613022722&s=612x612&w=0&h=Fr-1qc4a04U0fI0wUlrTu1I-UeGycNNtMlN7pPPXAtc='
-                return render_template('index.html', url=url)
-    return render_template('add_recipe.html', recipe=recipe.to_html(classes='data', header="true"))
 
 @app.route("/recipe_sent", methods=["GET", "POST"])
 def recipe_sent():

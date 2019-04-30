@@ -10,9 +10,20 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 from create_driver import chrome_driver
+import re
+import nltk
+#nltk.data.path.append('./nltk_data/')
+nltk.download('wordnet')
+from nltk.stem.wordnet import WordNetLemmatizer
+
+
 
 class get_ingredients():
     def __init__(self):
+        self.metrics = ['tablespoon', 'teaspoon', 'tbsp', 'tsp', 'cup', 'ounce', 'oz', \
+                        'quart', 'qt', 'pt', 'pint', 'gallon', 'gal', 'pount', 'lb', 'g', \
+                        'gram', 'kilogram', 'kg', 'liter', 'L', 'millileter', 'mL']
+        self.basic_ingredient_list = pd.read_csv('data/ingredient_list.csv')
         self.driver = chrome_driver().setUp()
         self.final_df = pd.DataFrame(columns=['quantity', 'ingredient'])
 
@@ -45,6 +56,40 @@ class get_ingredients():
                 allrecipes_ingredient_list['ingredient'].append(' '.join(ingredient.text.split('\n')[0].split(' ')[1:]))
                 allrecipes_ingredient_list['quantity'].append(ingredient.text.split('\n')[0].split(' ')[0])
             self.final_df = self.final_df.append(pd.DataFrame(allrecipes_ingredient_list), ignore_index=True)
+
+
+    def clean_list(self):
+        lmtzr = WordNetLemmatizer()
+        self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: ', '.join([lmtzr.lemmatize(y).lower() for y in x.split(' ')]).replace(',', ''))
+        self.final_df['metric'] = self.final_df['ingredient'].apply(lambda x: self.strip_measurements(x, self.metrics))
+        self.final_df['ingredient'] = self.final_df.apply(lambda row: self.strip_word(row), axis=1)
+        self.final_df['ingredient'] = self.final_df.apply(lambda row: self.standardize_ingredients(row, self.basic_ingredient_list['ingredients']), axis=1)
+
+    def strip_measurements(self, x, metrics):
+        found_word = ''
+        for word in x.split(' '):
+            if word in metrics:
+                found_word = word
+        return found_word
+
+    def strip_word(self, row):
+        try:
+            new_recipe_ingredients = row['ingredient'].replace(row['metric'], '')
+            new_recipe_ingredients = re.sub('[^A-Za-z0-9]+', ' ', new_recipe_ingredients)
+        except:
+            new_recipe_ingredients = re.sub('[^A-Za-z0-9]+', ' ', row['ingredient'])
+        return new_recipe_ingredients
+
+    def standardize_ingredients(self, row, ingredients):
+        possible_standard = []
+        for ingredient in ingredients:
+            if ingredient in row['ingredient']:
+                possible_standard.append(ingredient)
+        if len(possible_standard) == 0:
+            return row['ingredient']
+        else:
+            return max(possible_standard, key=len)
+
 #
 # from sklearn.feature_extraction.text import CountVectorizer
 # vectorizer = CountVectorizer(stop_words='english', lowercase=True, strip_accents='ascii')

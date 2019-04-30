@@ -1,6 +1,6 @@
 <html>
   <head>
-    <style type="text/css">
+    <!-- <style type="text/css">
       body {
         background: black;
         color: white;
@@ -15,7 +15,7 @@
       h4 {
         text-transform: uppercase;
       }
-    </style>
+    </style> -->
     <title> Recipe Aggregator </title>
   </head>
   <body>
@@ -23,6 +23,7 @@
     <form method="POST" action="/recipe_sent">
       <h3>Send Recipe to Email</h3>
       <input type="text" name="recipe_sent">
+      <input type="hidden" name='recipe_list' value="{{recipe}}">
       <input type="Submit">
     </form>
   </body>

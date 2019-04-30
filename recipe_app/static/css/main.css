@@ -1,0 +1,48 @@
+@font-face{
+font-family: JSBold;
+src: url('JosefinSans-Bold.ttf')
+}
+
+header {
+	font-family: JSBold;
+	background-color:darkblue;
+}
+/* Bottom left text */
+.top-left {
+	position: absolute;
+  top: 100px;
+  left: 275px;
+	font-size: 100px;
+	color: darkblue
+}
+
+.topribbon {
+  background-color: darkblue;
+}
+
+.topribbon a {
+  float: right;
+  color: white;
+  text-align: center;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 25px;
+  border-radius: 4px;
+}
+
+body {
+	font-family: JSBold;
+	background: white;
+	color: "5DBCD2";
+}
+
+.container {
+	text-align: center;
+}
+
+input {
+  border: 2px solid darkblue;
+  border-radius: 4px;
+	left: 50%;
+}

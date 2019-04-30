@@ -8,7 +8,7 @@ mail = Mail(app)
 @app.route('/')
 @app.route("/index", methods=["GET", "POST"])
 def index():
-    url = 'https://media.istockphoto.com/photos/empty-plate-with-knife-and-fork-on-white-kitchen-table-picture-id613022722?k=6&m=613022722&s=612x612&w=0&h=Fr-1qc4a04U0fI0wUlrTu1I-UeGycNNtMlN7pPPXAtc='
+    url = 'https://image.freepik.com/foto-gratis/vista-aerea-placa-blanca-vacia-sobre-fondo-azul_23-2147865612.jpg'
     if request.method == "POST":
         try:
             recipe_urls = request.form['recipe_urls']

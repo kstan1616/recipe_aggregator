@@ -11,14 +11,19 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 from create_driver import chrome_driver
 import re
+import nltk
+#nltk.data.path.append('./nltk_data/')
+nltk.download('wordnet')
 from nltk.stem.wordnet import WordNetLemmatizer
+
+
 
 class get_ingredients():
     def __init__(self):
         self.metrics = ['tablespoon', 'teaspoon', 'tbsp', 'tsp', 'cup', 'ounce', 'oz', \
                         'quart', 'qt', 'pt', 'pint', 'gallon', 'gal', 'pount', 'lb', 'g', \
                         'gram', 'kilogram', 'kg', 'liter', 'L', 'millileter', 'mL']
-        self.basic_ingredient_list = pd.read_csv('ingredient_list.csv')
+        self.basic_ingredient_list = pd.read_csv('data/ingredient_list.csv')
         self.driver = chrome_driver().setUp()
         self.final_df = pd.DataFrame(columns=['quantity', 'ingredient'])
 
@@ -55,7 +60,6 @@ class get_ingredients():
 
     def clean_list(self):
         lmtzr = WordNetLemmatizer()
-        nltk.data.path.append('./nltk_data/')
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: ', '.join([lmtzr.lemmatize(y).lower() for y in x.split(' ')]).replace(',', ''))
         self.final_df['metric'] = self.final_df['ingredient'].apply(lambda x: self.strip_measurements(x, self.metrics))
         self.final_df['ingredient'] = self.final_df.apply(lambda row: self.strip_word(row), axis=1)

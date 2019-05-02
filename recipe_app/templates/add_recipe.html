@@ -1,24 +1,15 @@
 <html>
   <head>
-    <!-- <style type="text/css">
-      body {
-        background: black;
-        color: white;
-      }
-      div.container {
-        max-width: 1000px;
-        margin: 100px auto;
-        border: 20px solid white;
-        padding: 10px;
-        text-align: center;
-      }
-      h4 {
-        text-transform: uppercase;
-      }
-    </style> -->
-    <title> Recipe Aggregator </title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/main.css') }}">
   </head>
   <body>
+    <header>
+      <div class="topribbon" height="30">
+        <a>Blog</a>
+        <a>Contact</a>
+        <a>About</a>
+      </div>
+    <header/>
     <h1>{{recipe|safe}}</h1>
     <form method="POST" action="/recipe_sent">
       <h3>Send Recipe to Email</h3>

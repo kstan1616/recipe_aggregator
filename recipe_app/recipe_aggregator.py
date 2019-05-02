@@ -16,8 +16,6 @@ import nltk
 nltk.download('wordnet')
 from nltk.stem.wordnet import WordNetLemmatizer
 
-
-
 class get_ingredients():
     def __init__(self):
         self.metrics = ['tablespoon', 'teaspoon', 'tbsp', 'tsp', 'cup', 'ounce', 'oz', \
@@ -56,7 +54,6 @@ class get_ingredients():
                 allrecipes_ingredient_list['ingredient'].append(' '.join(ingredient.text.split('\n')[0].split(' ')[1:]))
                 allrecipes_ingredient_list['quantity'].append(ingredient.text.split('\n')[0].split(' ')[0])
             self.final_df = self.final_df.append(pd.DataFrame(allrecipes_ingredient_list), ignore_index=True)
-
 
     def clean_list(self):
         lmtzr = WordNetLemmatizer()

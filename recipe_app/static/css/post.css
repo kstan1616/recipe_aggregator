@@ -8,7 +8,6 @@ header {
 }
 
 .topribbon {
-  float: right;
   color: white;
 	background-color: darkblue;
 	width:100%;
@@ -18,6 +17,7 @@ header {
   font-size: 18px;
   line-height: 25px;
   border-radius: 4px;
+	margin-bottom:30px;
 }
 
 .topribbon a {
@@ -37,6 +37,11 @@ body {
 	margin-bottom: 20px;
 	margin-left: 10%;
 	margin-right: 10%;
+}
+
+.card .recipeimg {
+	margin-left: 10%;
+  padding-bottom: 20px;
 }
 
 .card a {

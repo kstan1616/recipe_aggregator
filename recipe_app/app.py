@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 from recipe_aggregator import get_ingredients
 from flask_mail import Mail, Message
 
@@ -51,6 +51,14 @@ def recipe_sent():
     # msg.html = recipe_list
     # mail.send(msg)
     return render_template('recipe_sent.html', email=email)
+
+@app.route("/blog", methods=["GET", "POST"])
+def blog():
+    return render_template('blog.html')
+
+@app.route("/post", methods=["GET", "POST"])
+def post():
+    return render_template('post.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)

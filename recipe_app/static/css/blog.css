@@ -1,0 +1,94 @@
+@font-face{
+font-family: JSBold;
+src: url('JosefinSans-Bold.ttf')
+}
+
+header {
+	font-family: JSBold;
+}
+
+.topribbon {
+  float: right;
+  color: white;
+	background-color: darkblue;
+	width:100%;
+  text-align: right;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 25px;
+  border-radius: 4px;
+}
+
+.topribbon a {
+	padding:20px;
+}
+
+body {
+	font-family: JSBold;
+	background: rgb(93,188,210);
+	padding: 0px;
+	margin: 0px;
+}
+
+.leftcolumn {
+  float: left;
+  width: 42.5%;
+	margin-left: 5%;
+	background-color: rgb(93,188,210);
+}
+
+.rightcolumn {
+  float: right;
+  width: 42.5%;
+  margin-right: 5%;
+	background-color: rgb(93,188,210);
+}
+
+.recipeimg {
+	width: 90%;
+	margin-left: 10%;
+	margin-right: 10%;
+	padding-bottom: 20px;
+}
+
+.card {
+  background-color: white;
+  margin-top: 20px;
+	margin-bottom: 20px;
+	padding-bottom: 20px;
+}
+
+.card a {
+	margin-left: 10%;
+  padding-bottom: 20px;
+}
+
+.card h2 {
+	margin-left: 10%;
+	padding-top: 20px;
+}
+
+.card h5 {
+	margin-left: 10%;
+  margin-top: 20px;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+input {
+  border: 2px solid darkblue;
+  border-radius: 4px;
+	left: 50%;
+}
+
+/* @media screen and (max-width: 800px) {
+  .leftcolumn, .rightcolumn {
+    width: 100%;
+    padding: 0;
+  }
+} */

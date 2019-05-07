@@ -1,9 +1,22 @@
 from flask import Flask, render_template, request, url_for
 from recipe_aggregator import get_ingredients
 from flask_mail import Mail, Message
+import os
 
 app = Flask(__name__)
+mail_settings = {
+    "MAIL_SERVER": 'smtp.gmail.com',
+    "DEBUG":True,
+    "MAIL_PORT": 587,
+    "MAIL_USE_TLS": True,
+    "MAIL_USE_SSL": False,
+    "MAIL_USERNAME": os.getenv('MAIL_USERNAME'),
+    "MAIL_PASSWORD": os.getenv('MAIL_PASSWORD')
+}
+app.config.update(mail_settings)
 mail = Mail(app)
+
+print('made it')
 
 @app.route('/')
 @app.route("/index", methods=["GET", "POST"])
@@ -44,12 +57,13 @@ def add_recipe():
 @app.route("/recipe_sent", methods=["GET", "POST"])
 def recipe_sent():
     email = request.form['recipe_sent']
-    # recipe_list = request.form['recipe_list']
-    # msg = Message("Recipe List",
-    #               sender="kyle.m.stanley16@gmail.com",
-    #               recipients=["kyle.m.stanley16@gmail.com"])
-    # msg.html = recipe_list
-    # mail.send(msg)
+    recipe_list = request.form['recipe_list']
+    msg = Message("Recipe List",
+                  sender="recipegenius.list@gmail.com",
+                  recipients=[email])
+    print('made it too')
+    msg.html = recipe_list
+    mail.send(msg)
     return render_template('recipe_sent.html', email=email)
 
 @app.route("/blog", methods=["GET", "POST"])

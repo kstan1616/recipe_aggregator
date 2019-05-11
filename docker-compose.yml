@@ -7,6 +7,8 @@ services:
       - 80:80
     volumes:
       - ./recipe_app:/recipe_app
+    env_file:
+      - .env
   # selenium-hub:
   #   image: selenium/hub
   #   container_name: selenium-hub

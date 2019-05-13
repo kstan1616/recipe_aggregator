@@ -10,12 +10,51 @@
         <a>About</a>
       </div>
     <header/>
-    <h1>{{recipe|safe}}</h1>
+    <table id="myTable">
+      <thead>
+        <tr>
+          <th width="200">Ingredient</th>
+          <th>Metric</th>
+          <th>Quantity</th>
+          <th>Delete Row</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for element in recipe %}
+        <tr id="{{ element['id'] }}">
+          <td contenteditable='true'>{{ element['ingredient'] }}</td>
+          <td contenteditable='true'>{{ element['metric'] }}</td>
+          <td contenteditable='true'>{{ element['quantity'] }}</td>
+          <td><input type="button" value="Delete" onclick="deleteRow(this)"></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <button id="add_row" onclick="myCreateFunction()">Create row</button>
     <form method="POST" action="/recipe_sent">
       <h3>Send Recipe to Email</h3>
       <input type="text" name="recipe_sent">
       <input type="hidden" name='recipe_list' value="{{recipe}}">
       <input type="Submit">
     </form>
+    <script>
+      function myCreateFunction() {
+        var table = document.getElementById("myTable");
+        var row = table.insertRow(-1);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell1 = row.insertCell(2);
+        var cell2 = row.insertCell(3);
+        cell1.innerHTML = "";
+        cell2.innerHTML = "";
+        cell1.innerHTML = "";
+        cell2.innerHTML = '<td><input type="button" value="Delete" onclick="deleteRow(this)"></td>';
+      }
+      function deleteRow(r) {
+        var i = r.parentNode.parentNode.rowIndex;
+        document.getElementById("myTable").deleteRow(i);
+      }
+    </script>
+
   </body>
 </html>

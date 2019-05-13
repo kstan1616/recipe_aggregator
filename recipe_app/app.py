@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, url_for
 from recipe_aggregator import get_ingredients
 from flask_mail import Mail, Message
 import os
+import json
 
 app = Flask(__name__)
 mail_settings = {
@@ -48,7 +49,9 @@ def add_recipe():
                 ingredient_list.scrape_ingredients(recipe_link, 'all')
         ingredient_list.clean_list()
         recipe = ingredient_list.final_df
-        return render_template('add_recipe.html', recipe=recipe.to_html(classes='data', header="true"))
+        recipe['id'] = [x for x in range(0, len(recipe))]
+        recipe = json.loads(recipe.to_json(orient='records'))
+        return render_template('add_recipe.html', recipe=recipe)
     else:
         url = 'https://media.istockphoto.com/photos/empty-plate-with-knife-and-fork-on-white-kitchen-table-picture-id613022722?k=6&m=613022722&s=612x612&w=0&h=Fr-1qc4a04U0fI0wUlrTu1I-UeGycNNtMlN7pPPXAtc='
         return render_template('index.html', url=url)

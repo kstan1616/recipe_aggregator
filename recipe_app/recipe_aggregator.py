@@ -21,7 +21,7 @@ class get_ingredients():
         self.metrics = ['tablespoon', 'teaspoon', 'tbsp', 'tsp', 'cup', 'ounce', 'oz', \
                         'quart', 'qt', 'pt', 'pint', 'gallon', 'gal', 'pount', 'lb', 'g', \
                         'gram', 'kilogram', 'kg', 'liter', 'L', 'millileter', 'mL']
-        self.basic_ingredient_list = pd.read_csv('data/ingredient_list.csv')
+        self.basic_ingredient_list = pd.read_csv('data/final_recipe_list_categorized.csv', index_col=0, encoding='latin')
         self.driver = chrome_driver().setUp()
         self.final_df = pd.DataFrame(columns=['quantity', 'ingredient'])
 
@@ -60,7 +60,7 @@ class get_ingredients():
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: ', '.join([lmtzr.lemmatize(y).lower() for y in x.split(' ')]).replace(',', ''))
         self.final_df['metric'] = self.final_df['ingredient'].apply(lambda x: self.strip_measurements(x, self.metrics))
         self.final_df['ingredient'] = self.final_df.apply(lambda row: self.strip_word(row), axis=1)
-        self.final_df['ingredient'] = self.final_df.apply(lambda row: self.standardize_ingredients(row, self.basic_ingredient_list['ingredients']), axis=1)
+        self.final_df['ingredient'] = self.final_df.apply(lambda row: self.standardize_ingredients(row, self.basic_ingredient_list['ingredient']), axis=1)
 
     def strip_measurements(self, x, metrics):
         found_word = ''

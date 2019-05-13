@@ -31,20 +31,36 @@ body {
 	margin: 0px;
 }
 
-.dataframe.mystyle {
+table {
+  border-collapse: collapse;
+  width: 60%;
 	margin-left: 20%;
-	margin-right: 20%;
+	margin-bottom: 20%;
+	margin-bottom: 10px;
 }
 
-.mystyle td, th {
-    padding: 5px;
+table td, table th {
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
-.mystyle tr:nth-child(even) {
-    background: #E0E0E0;
+table tr:nth-child(even){background-color: grey;}
+table tr:nth-child(odd){background-color: white;}
+
+table tr:hover {background-color: #ddd;}
+
+table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: darkblue;
+  color: white;
 }
 
-.mystyle tr:hover {
-    background: silver;
-    cursor: pointer;
+button {
+	margin-left:20%;
+}
+
+form {
+	margin-left:20%;
 }

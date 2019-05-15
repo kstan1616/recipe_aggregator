@@ -12,8 +12,10 @@ import pandas as pd
 # from create_driver import chrome_driver
 import re
 import nltk
-#nltk.data.path.append('./nltk_data/')
+nltk.data.path.append('./nltk_data/')
 nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
 from nltk.stem.wordnet import WordNetLemmatizer
 from difflib import SequenceMatcher
 import operator
@@ -36,7 +38,6 @@ class get_ingredients():
         self.final_df = pd.DataFrame(columns=['quantity', 'ingredient'])
 
     def scrape_ingredients(self, link, site):
-        self.driver.get(link)
         # NYT
         if site == 'nyt':
             response = requests.get(link)
@@ -59,24 +60,48 @@ class get_ingredients():
             for li in ul.findAll("li"):
                 epicurious_ingredient_list['ingredient'].append(li.text)
                 epicurious_ingredient_list['quantity'].append(None)
+            df = pd.DataFrame(epicurious_ingredient_list)
             df['quantity'] = df['ingredient'].apply(lambda x: self.strip_quantity(x))
             self.final_df = self.final_df.append(df, ignore_index=True)
         # All
-#         if site == 'all':
-#             allrecipes_ingredient_list = {'ingredient':[], 'quantity':[]}
-#             self.driver.get(link)
-#             for ingredient in self.driver.find_elements_by_class_name('checkList__line'):
-#                 allrecipes_ingredient_list['ingredient'].append(' '.join(ingredient.text.split('\n')[0].split(' ')[1:]))
-#                 allrecipes_ingredient_list['quantity'].append(ingredient.text.split('\n')[0].split(' ')[0])
-#             self.final_df = self.final_df.append(pd.DataFrame(allrecipes_ingredient_list), ignore_index=True)
-            
+        if site == 'all':
+            response = requests.get(link)
+            soup = BeautifulSoup(response.text)
+            all_ingredient_list = {'quantity':[], 'ingredient':[]}
+            for li in soup.findAll("li" , {"class":"checkList__line"}):
+                all_ingredient_list['ingredient'].append(li.text.replace('\n', ''))
+                try:
+                    quantity = li.text.replace('\n', '').split(' ')[0]
+                    all_ingredient_list['quantity'].append(quantity)
+                except:
+                    all_ingredient_list['quantity'].append(quantity)
+            df = pd.DataFrame(all_ingredient_list)
+            df['ingredient'] = df['ingredient'].apply(lambda x: self.clean_all_ingredients(x))
+            df = df[df['ingredient'] != '']
+            df = df[df['quantity'] != 'Add']
+            self.final_df = self.final_df.append(df, ignore_index=True)
+
+    def clean_all_ingredients(self, x):
+        x = x.split(' ')
+        try:
+            y = x[0]
+            test = int(y.split('/')[0])
+            final_string = ' '.join(x[1:])
+        except:
+            try:
+                test = int(x[0])
+                final_string = ' '.join(x[1:])
+            except:
+                final_string = ' '.join(x)
+        return final_string
+
     def strip_quantity(self, x):
         x = x.split(' ')
         quantity = ''
         try:
             quantity = quantity + str(int(x[0].split('/')[0]) / int(x[0].split('/')[1]))
         except:
-            try: 
+            try:
                 quantity = quantity + str(int(x[0]))
                 try:
                     quantity = quantity + '.' + str(int(x[1].split('/')[0]) / int(x[1].split('/')[1])).split('.')[1]
@@ -100,7 +125,7 @@ class get_ingredients():
         self.final_df = self.final_df.groupby(['ingredient', 'category']).agg(lambda x: x.tolist())
         self.final_df = self.final_df.groupby(['ingredient', 'category']).agg(lambda x: x.tolist()).sort_values(['category']).reset_index()
         self.final_df = self.final_df[['ingredient', 'category', 'quantity', 'metric', 'original_recipe']]
-        
+
 
     #Find words in metrics list for recipe list generation
 
@@ -110,10 +135,10 @@ class get_ingredients():
         for word in x.split(' '):
             if word in metrics:
                 found_metrics = found_metrics + ' ' + word
-            else: 
+            else:
                 keep_words = keep_words + ' ' + word
         return keep_words + '|' + found_metrics
-    
+
     def add_metrics(self, x):
         x = x.split('|')
         return x[1]
@@ -132,7 +157,7 @@ class get_ingredients():
             else:
                 pass
         return new_string.lower()
-    
+
     def try_lemmatize(self, x):
         try:
             return_string = lmtzr.lemmatize(x).lower().encode('ascii')
@@ -143,7 +168,7 @@ class get_ingredients():
     def lemmatizer(self, x):
         lmtzr = WordNetLemmatizer()
         return ' '.join([self.try_lemmatize(y) for y in x.split(' ')])
-    
+
     #create list of ngrms turned into individual strings
     #['I', 'am', 'I am']
 
@@ -155,7 +180,7 @@ class get_ingredients():
             n_grams = ngrams(word_tokenize(text), n)
             final.append([ ' '.join(grams) for grams in n_grams])
         return [item for sublist in final for item in sublist]
-    
+
     #Find longest matching string in 'ingredient' field in database
 
     def standardize_ingredients(self, row, ingredients):

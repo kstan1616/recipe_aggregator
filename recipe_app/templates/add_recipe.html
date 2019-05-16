@@ -30,22 +30,14 @@
           <td contenteditable='true'>{{ element['quantity'] }}</td> -->
       	  <td>
       	     <form>
-      	        <select name='metric'>
-      	        {% for metric in element['metric'][0] %}
+      	        <select name='metric' onChange="showAnswer(this.value, '{{ element['metric'] }}'">
+      	        {% for metric in element['metric'].keys() %}
       		         <option value="{{ metric }}">{{ metric }}</option>
                 {% endfor %}
       		      </select>
       	     </form>
       	  </td>
-      	  <td>
-      	     <form>
-      	        <select name='quantity'>
-      	        {% for quantity in element['metric'][1] %}
-      		         <option value="{{ quantity }}">{{ quantity }}</option>
-                {% endfor %}
-      		      </select>
-      	     </form>
-      	  </td>
+      	  <td id='quantity'> {{ element['metric'].values()[0] }} </td>
       	  <td>{{ element['original_recipe'] }}</td>
           <td><input type="button" value="Delete" onclick="deleteRow(this)"></td>
         </tr>
@@ -79,6 +71,9 @@
       function deleteRow(r) {
         var i = r.parentNode.parentNode.rowIndex;
         document.getElementById("myTable").deleteRow(i);
+      }
+      function showAnswer(id, answers) {
+      document.getElementById('quantity').innerHTML = answers[id];
       }
     </script>
 

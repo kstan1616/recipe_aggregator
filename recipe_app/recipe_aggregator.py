@@ -322,7 +322,7 @@ class get_ingredients():
             desired_metric.append('oz')
             desired_quantity.append(self.ounces_to_mL(self.cup_to_ounces(quantity)))
             desired_metric.append('mL')
-        output = (desired_quantity, desired_metric)
+        output = dict(zip(desired_metric, desired_quantity))
         return output
 
     def perform_metric_aggregates(self, row):
@@ -330,9 +330,9 @@ class get_ingredients():
             output = self.metric_aggregate(row['metric'], row['quantity'])
         except:
             try:
-                output = row['quantity']
+                output = {'quantity': row['quantity']}
             except:
-                output = None
+                output = {'quantity': None}
         return output
 
     def fix_quantity(self, x):

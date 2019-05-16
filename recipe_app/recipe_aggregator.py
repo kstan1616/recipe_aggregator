@@ -117,14 +117,16 @@ class get_ingredients():
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.strip_measurements(x, self.metrics))
         self.final_df['metric'] = self.final_df['ingredient'].apply(lambda x: self.add_metrics(x))
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.remove_metrics(x))
+        self.final_df['metric'] = self.final_df.apply(lambda row: self.perform_metric_aggregates(row))
+        self.final_df.drop('quantity', axis=1, inplace=True)
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.pos(x))
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.lemmatizer(x))
         self.final_df['ingredient'] = self.final_df.apply(lambda row: self.standardize_ingredients(row, self.basic_ingredient_list), axis=1)
         self.final_df['category'] = self.final_df['ingredient'].apply(lambda x: self.add_metrics(x))
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.remove_metrics(x))
         self.final_df = self.final_df.groupby(['ingredient', 'category']).agg(lambda x: x.tolist())
-        self.final_df = self.final_df.groupby(['ingredient', 'category']).agg(lambda x: x.tolist()).sort_values(['category']).reset_index()
-        self.final_df = self.final_df[['ingredient', 'category', 'quantity', 'metric', 'original_recipe']]
+#         self.final_df = self.final_df.groupby(['ingredient', 'category']).agg(lambda x: x.tolist()).sort_values(['category']).reset_index()
+        self.final_df = self.final_df[['ingredient', 'category', 'metric', 'original_recipe']]
 
 
     #Find words in metrics list for recipe list generation
@@ -195,38 +197,131 @@ class get_ingredients():
         else:
             return max(possible_standard, key=len) + '|' + ingredients['category'][ingredients['ingredient'] == max(possible_standard, key=len)].iloc[0]
 
+    def gallon_to_quart(self, n_gallon):
+        n_quarts = n_gallon * 4
+        return n_quarts
 
-#
-# from sklearn.feature_extraction.text import CountVectorizer
-# vectorizer = CountVectorizer(stop_words='english', lowercase=True, strip_accents='ascii')
-# matrix = vectorizer.fit_transform(df['ingredient'])
-#
-# top_ingredients = pd.DataFrame({'count': matrix.toarray().sum(axis=0), \
-#               'ingredient_word' : vectorizer.get_feature_names()}).sort_values(by=['count'], ascending=False)
-#
-# print(top_ingredients)
-#
-#
-# def cups_to_oz(x):
-#     return x * 8
-#
-# def oz_to_cups(x):
-#     return float(x)/8
-#
-# def cups_to_ml(x):
-#     return x*240
-#
-# def ml_to_cups(x):
-#     return float(x)/240
-#
-# def cups_to_tbsp(x):
-#     return x*16
-#
-# def tbsp_to_cups(x):
-#     return float(x)/16
-#
-# def oz_to_grams(x):
-#     return x*28.350
-#
-# def grams_to_oz(x):
-#     return x/28.350
+    def quart_to_pints(self, n_quarts):
+        n_pints = n_quarts * 2
+        return n_pints
+
+    def pint_to_cups(self, n_pints):
+        n_cups = n_pints * 2
+        return n_cups
+
+    def cup_to_ounces(self, n_cups):
+        n_ounces = n_cups * 8
+        return n_ounces
+
+    def tsps_to_tbs(self, n_tsps):
+        n_tbs = float(n_tsps)/3
+        return n_tbs
+
+    def tbs_to_cups(self, n_tbs):
+        n_cups = float(n_tbs)/16
+        return n_cups
+
+    def ounces_to_mL(self, n_ounces):
+        n_mLs = n_ounces * 29.5735
+        return n_mLs
+
+    def mL_to_ounces(self, n_mLs):
+        n_ounces = n_mLs / 29.5735
+        return n_ounces
+
+    def pounds_to_kilos(self, n_pounds):
+        n_kilos = n_pounds / 2.205
+        return n_kilos
+
+    def kilos_to_pounds(self, n_kilos):
+        n_pounds = n_kilos * 2.205
+        return n_pounds
+
+    def ounces_to_grams(self, n_ounces):
+        n_grams = n_ounces * 28.35
+        return n_grams
+
+    def grams_to_ounces(self, n_grams):
+        n_ounces = n_grams / 28.35
+        return n_ounces
+
+    def pounds_to_ounces(self, n_pounds):
+        n_ounces = n_pounds * 16
+        return n_ounces
+
+
+    def metric_aggregate(self, metric, quantity):
+        desired_quantity = []
+        desired_metric = []
+        quantity = int(quantity)
+        if metric in ['tablespoon', 'tbsp', 'tablespoons', 'tbsps']:
+            desired_quantity.append(self.cup_to_ounces(self.tbs_to_cups(quantity)))
+            desired_metric.append('oz')
+            desired_quantity.append(self.ounces_to_mL(self.cup_to_ounces(self.tbs_to_cups(quantity))))
+            desired_metric.append('mL')
+        if metric in ['teaspoon', 'tsp', 'teaspoons', 'tsps']:
+            desired_quantity.append(self.cup_to_ounces(self.tbs_to_cups(self.tsps_to_tbs(quantity))))
+            desired_metric.append('oz')
+            desired_quantity.append(self.ounces_to_mL(self.cup_to_ounces(self.tbs_to_cups(self.tsps_to_tbs(quantity)))))
+            desired_metric.append('mL')
+        if metric in ['ounce', 'oz', 'ounces', 'oz']:
+            desired_quantity.append(quantity)
+            desired_metric.append('oz')
+            desired_quantity.append(self.ounces_to_mL(quantity))
+            desired_metric.append('mL')
+        if metric in ['quart', 'qt', 'qts', 'quarts']:
+            desired_quantity.append(self.cups_to_ounces(self.pints_to_cups(self.quart_to_pints(quantity))))
+            desired_metric.append('oz')
+            desired_quantity.append(ounces_to_mL(self.cups_to_ounces(self.pints_to_cups(self.quart_to_pints(quantity)))))
+            desired_metric.append('mL')
+        if metric in ['pt', 'pint', 'pints', 'pts']:
+            desired_quantity.append(self.cups_to_ounces(self.pints_to_cups(quantity)))
+            desired_metric.append('oz')
+            desired_quantity.append(self.ounces_to_mL(self.cups_to_ounces(self.pints_to_cups(quantity))))
+            desired_metric.append('mL')
+        if metric in ['gallon', 'gal', 'gallons']:
+            desired_quantity.append(self.cups_to_ounces(self.pints_to_cups(self.quart_to_pints(self.qallon_to_quart(quantity)))))
+            desired_metric.append('oz')
+            desired_quantity.append(self.ounces_to_mL(self.cups_to_ounces(self.pints_to_cups(self.quart_to_pints(self.gallon_quart(quantity))))))
+            desired_metric.append('mL')
+        if metric in ['pound', 'lb', 'lbs', 'pounds']:
+            desired_quantity.append(self.pounds_to_ounces(quantity))
+            desired_metric.append('oz')
+            desired_quantity.append(self.ounces_to_grams(self.pounds_to_ounces(quantity)))
+            desired_metric.append('g')
+            desired_quantity.append(self.pounds_to_kilos(quantity))
+            desired_metric.append('kg')
+        if metric in ['g', 'gram', 'grams']:
+            desired_quantity.append(self.grams_to_ounces(quantity))
+            desired_metric.append('oz')
+            desired_quantity.append(quantity)
+            desired_metric.append('g')
+            desired_quantity.append(quantity / 1000.0)
+            desired_metric.append('kg')
+        if metric in ['kg', 'kilogram', 'kilograms', 'kgs']:
+            desired_quantity.append(self.pounds_to_ounces(self.kilos_to_pounds(quantity)))
+            desired_metric.append('oz')
+            desired_quantity.append(quantity / 1000.0)
+            desired_metric.append('g')
+            desired_quantity.append(quantity)
+            desired_metric.append('kg')
+        if metric in ['milliliter', 'mL', 'mLs', 'milliliters']:
+            desired_quantity.append(self.mL_to_ounces(quantity))
+            desired_metric.append('oz')
+            desired_quantity.append(quantity)
+            desired_metric.append('mL')
+        if metric in ['liter', 'L', 'liters']:
+            desired_quantity.append(self.mL_to_ounces(quantity / 1000.0))
+            desired_metric.append('oz')
+            desired_quantity.append(quantity / 1000.0)
+            desired_metric.append('mL')
+        output = (desired_quantity, desired_metric)
+        return output
+
+    def perform_metric_aggregates(self, row):
+        try:
+            output = self.metric_aggregate(row['metric'], row['quantity'])
+        except:
+            output = row['quantity']
+        return output
+    

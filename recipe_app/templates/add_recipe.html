@@ -26,23 +26,27 @@
         <tr id="{{ element['id'] }}">
           <td contenteditable='true'>{{ element['ingredient'] }}</td>
           <td contenteditable='true'>{{ element['category'] }}</td>
-	  <td>
-	     <form>
-	        <select name='metric'>
-	        {% for metric in element['metric'][0] %}
-		   <option>{{ metric }}</option>
-		</select>
-	     </form>
-	  </td>
-	  <td>
-	     <form>
-	        <select name='quantity'>
-	        {% for quantity in element['quantity'][1] %}
-		   <option>{{ quantity }}</option>
-		</select>
-	     </form>
-	  </td>
-	  <td>{{ element['original_recipe'] }}</td>
+          <!-- <td contenteditable='true'>{{ element['metric'] }}</td>
+          <td contenteditable='true'>{{ element['quantity'] }}</td> -->
+      	  <td>
+      	     <form>
+      	        <select name='metric'>
+      	        {% for metric in element['metric'][0] %}
+      		         <option value="{{ metric }}">{{ metric }}</option>
+                {% endfor %}
+      		      </select>
+      	     </form>
+      	  </td>
+      	  <td>
+      	     <form>
+      	        <select name='quantity'>
+      	        {% for quantity in element['metric'][1] %}
+      		         <option value="{{ quantity }}">{{ quantity }}</option>
+                {% endfor %}
+      		      </select>
+      	     </form>
+      	  </td>
+      	  <td>{{ element['original_recipe'] }}</td>
           <td><input type="button" value="Delete" onclick="deleteRow(this)"></td>
         </tr>
       {% endfor %}

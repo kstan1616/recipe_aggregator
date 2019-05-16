@@ -50,6 +50,7 @@ def add_recipe():
         ingredient_list.clean_list()
         recipe = ingredient_list.final_df
         recipe['id'] = [x for x in range(0, len(recipe))]
+        print(recipe)
         recipe = json.loads(recipe.to_json(orient='records'))
         return render_template('add_recipe.html', recipe=recipe)
     else:

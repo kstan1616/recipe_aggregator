@@ -117,16 +117,17 @@ class get_ingredients():
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.strip_measurements(x, self.metrics))
         self.final_df['metric'] = self.final_df['ingredient'].apply(lambda x: self.add_metrics(x))
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.remove_metrics(x))
-        self.final_df['metric'] = self.final_df.apply(lambda row: self.perform_metric_aggregates(row))
-        self.final_df.drop('quantity', axis=1, inplace=True)
+        self.final_df['quantity'] = self.final_df['quantity'].apply(lambda x: self.fix_quantity(x))
+        self.final_df['metric'] = self.final_df.apply(lambda row: self.perform_metric_aggregates(row), axis=1)
+        # self.final_df.drop('quantity', axis=1, inplace=True)
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.pos(x))
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.lemmatizer(x))
         self.final_df['ingredient'] = self.final_df.apply(lambda row: self.standardize_ingredients(row, self.basic_ingredient_list), axis=1)
         self.final_df['category'] = self.final_df['ingredient'].apply(lambda x: self.add_metrics(x))
         self.final_df['ingredient'] = self.final_df['ingredient'].apply(lambda x: self.remove_metrics(x))
-        self.final_df = self.final_df.groupby(['ingredient', 'category']).agg(lambda x: x.tolist())
+        # self.final_df = self.final_df.groupby(['ingredient', 'category']).agg(lambda x: x.tolist())
 #         self.final_df = self.final_df.groupby(['ingredient', 'category']).agg(lambda x: x.tolist()).sort_values(['category']).reset_index()
-        self.final_df = self.final_df[['ingredient', 'category', 'metric', 'original_recipe']]
+        self.final_df = self.final_df[['ingredient', 'category', 'metric', 'quantity', 'original_recipe']]
 
 
     #Find words in metrics list for recipe list generation
@@ -253,7 +254,8 @@ class get_ingredients():
     def metric_aggregate(self, metric, quantity):
         desired_quantity = []
         desired_metric = []
-        quantity = int(quantity)
+        quantity = float(quantity)
+        metric = metric.strip()
         if metric in ['tablespoon', 'tbsp', 'tablespoons', 'tbsps']:
             desired_quantity.append(self.cup_to_ounces(self.tbs_to_cups(quantity)))
             desired_metric.append('oz')
@@ -272,17 +274,17 @@ class get_ingredients():
         if metric in ['quart', 'qt', 'qts', 'quarts']:
             desired_quantity.append(self.cups_to_ounces(self.pints_to_cups(self.quart_to_pints(quantity))))
             desired_metric.append('oz')
-            desired_quantity.append(ounces_to_mL(self.cups_to_ounces(self.pints_to_cups(self.quart_to_pints(quantity)))))
+            desired_quantity.append(self.ounces_to_mL(self.cup_to_ounces(self.pints_to_cups(self.quart_to_pints(quantity)))))
             desired_metric.append('mL')
         if metric in ['pt', 'pint', 'pints', 'pts']:
             desired_quantity.append(self.cups_to_ounces(self.pints_to_cups(quantity)))
             desired_metric.append('oz')
-            desired_quantity.append(self.ounces_to_mL(self.cups_to_ounces(self.pints_to_cups(quantity))))
+            desired_quantity.append(self.ounces_to_mL(self.cup_to_ounces(self.pints_to_cups(quantity))))
             desired_metric.append('mL')
         if metric in ['gallon', 'gal', 'gallons']:
             desired_quantity.append(self.cups_to_ounces(self.pints_to_cups(self.quart_to_pints(self.qallon_to_quart(quantity)))))
             desired_metric.append('oz')
-            desired_quantity.append(self.ounces_to_mL(self.cups_to_ounces(self.pints_to_cups(self.quart_to_pints(self.gallon_quart(quantity))))))
+            desired_quantity.append(self.ounces_to_mL(self.cup_to_ounces(self.pints_to_cups(self.quart_to_pints(self.gallon_quart(quantity))))))
             desired_metric.append('mL')
         if metric in ['pound', 'lb', 'lbs', 'pounds']:
             desired_quantity.append(self.pounds_to_ounces(quantity))
@@ -315,6 +317,11 @@ class get_ingredients():
             desired_metric.append('oz')
             desired_quantity.append(quantity / 1000.0)
             desired_metric.append('mL')
+        if metric in ['cup', 'cups']:
+            desired_quantity.append(self.cup_to_ounces(quantity))
+            desired_metric.append('oz')
+            desired_quantity.append(self.ounces_to_mL(self.cup_to_ounces(quantity)))
+            desired_metric.append('mL')
         output = (desired_quantity, desired_metric)
         return output
 
@@ -322,6 +329,19 @@ class get_ingredients():
         try:
             output = self.metric_aggregate(row['metric'], row['quantity'])
         except:
-            output = row['quantity']
+            try:
+                output = row['quantity']
+            except:
+                output = None
         return output
-    
+
+    def fix_quantity(self, x):
+        add_list = []
+        x = x.split(' ')
+        for y in x:
+            try:
+                z = y.split('/')
+                add_list.append(float(z[0]) / float(z[1]))
+            except:
+                add_list.append(int(y))
+        return sum(add_list)

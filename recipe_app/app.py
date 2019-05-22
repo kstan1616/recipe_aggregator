@@ -74,6 +74,14 @@ def recipe_sent():
 def blog():
     return render_template('blog.html')
 
+@app.route("/about", methods=["GET", "POST"])
+def about():
+    return render_template('about.html')
+
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    return render_template('contact.html')
+
 @app.route("/post", methods=["GET", "POST"])
 def post():
     return render_template('post.html')

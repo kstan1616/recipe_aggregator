@@ -1,15 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
-#from IPython.core.display import HTML
 from selenium import webdriver
 import time
 import random
 import os
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
-# from create_driver import chrome_driver
 import re
 import nltk
 nltk.data.path.append('./nltk_data/')
@@ -22,6 +17,7 @@ import operator
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams
 import urllib.request
+import unicodedata
 
 class get_ingredients():
     def __init__(self):
@@ -31,10 +27,9 @@ class get_ingredients():
            'gal', 'gals', 'pound', 'pounds', 'lb', 'lbs', 'g', 'gs',\
            'gram', 'grams', 'kilogram', 'kilograms', 'kg', 'liter', 'liters', 'L', 'millileter', \
            'mL', 'millileters']
-        self.basic_ingredient_list = pd.read_csv('data/final_recipe_list_categorized.csv', index_col=0, encoding='latin')
+        self.basic_ingredient_list = pd.read_csv('../data/final_recipe_list_categorized.csv', index_col=0, encoding='latin')
         self.basic_ingredient_list['length'] = self.basic_ingredient_list['ingredient'].apply(lambda x: len(x))
         self.basic_ingredient_list = self.basic_ingredient_list[self.basic_ingredient_list['length'] > 2]
-#         self.driver = chrome_driver().setUp()
         self.final_df = pd.DataFrame(columns=['quantity', 'ingredient'])
 
     def scrape_ingredients(self, link, site):
@@ -45,10 +40,19 @@ class get_ingredients():
             nytimes_ingredient_list = {'quantity':[], 'ingredient':[]}
             ul = soup.find("ul", {"class": "recipe-ingredients"})
             for li in ul.findAll("li"):
-                try:
-                    nytimes_ingredient_list['quantity'].append(li.find("span", {"class": "quantity"}).text.replace('\n', '').strip())
+                try: 
+                    quantity = li.find("span", {"class": "quantity"}).text.replace('\n', '').strip().split()
+                    final_quantity = 0
+                    for q in quantity:
+                        try:
+                            q = unicodedata.numeric(q)
+                            final_quantity = final_quantity + q 
+                        except:
+                            pass
+                    nytimes_ingredient_list['quantity'].append(final_quantity)
+                    nytimes_ingredient_list['ingredient'].append(li.find("span", {"class": "ingredient-name"}).text.replace('\n', '').strip())
                 except:
-                    nytimes_ingredient_list['quantity'].append(None)
+                    nytimes_ingredient_list['quantity'].append('')
                     nytimes_ingredient_list['ingredient'].append(li.find("span", {"class": "ingredient-name"}).text.replace('\n', '').strip())
             self.final_df = self.final_df.append(pd.DataFrame(nytimes_ingredient_list), ignore_index=True)
         # EPI
@@ -99,12 +103,12 @@ class get_ingredients():
         x = x.split(' ')
         quantity = ''
         try:
-            quantity = quantity + str(int(x[0].split('/')[0]) / int(x[0].split('/')[1]))
+            quantity = quantity + str(float(x[0].split('/')[0]) / int(x[0].split('/')[1]))
         except:
             try:
                 quantity = quantity + str(int(x[0]))
                 try:
-                    quantity = quantity + '.' + str(int(x[1].split('/')[0]) / int(x[1].split('/')[1])).split('.')[1]
+                    quantity = quantity + '.' + str(float(x[1].split('/')[0]) / int(x[1].split('/')[1])).split('.')[1]
                 except:
                     pass
             except:
@@ -336,12 +340,22 @@ class get_ingredients():
         return output
 
     def fix_quantity(self, x):
+        try:
+            x = float(x)
+        except:
+            pass
         add_list = []
-        x = x.split(' ')
-        for y in x:
-            try:
-                z = y.split('/')
-                add_list.append(float(z[0]) / float(z[1]))
-            except:
-                add_list.append(int(y))
-        return sum(add_list)
+        try:
+            x = x.split(' ')
+            for y in x:
+                try:
+                    z = y.split('/')
+                    add_list.append(float(z[0]) / float(z[1]))
+                except:
+                    add_list.append(int(y))
+        except:
+            add_list.append(x)
+        try:
+            return sum(add_list)
+        except:
+            return 0

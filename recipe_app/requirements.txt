@@ -12,7 +12,7 @@ flask-wtf==0.14.2
 requests
 scipy==1.2.1
 scikit-learn==0.20.3
-numpy==1.15.4
+numpy==1.22.0
 redis==3.2.0
 rq==0.13.0
 bs4==0.0.1
